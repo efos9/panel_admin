@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PT RATEL HOME — Admin Absensi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f6f9; }
+    .sidebar-panel { background-color: #2f353a; }
+    .welcome-panel { background: linear-gradient(135deg, #1d5cff 0%, #0d38c9 65%, #08238a 100%); }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen">
+
+  <!-- LOGIN KHUSUS ADMIN -->
+  <div id="adminLoginScreen" class="min-h-screen flex items-center justify-center p-4 bg-[#eef2f8]">
+    <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 items-stretch gap-0 md:gap-4">
+      <div class="md:col-span-6 bg-white rounded-2xl shadow-xl border border-slate-200/80 p-7 sm:p-8 flex flex-col justify-between space-y-5">
+        <div class="space-y-4">
+          <div class="text-center">
+            <h1 class="text-xl font-extrabold text-slate-900 underline decoration-blue-600 decoration-2 underline-offset-8">
+              Login please
+            </h1>
+            <p class="text-[11px] text-slate-500 mt-3">
+              Admin PT RATEL HOME • Y5.T, No. 8, Pluit, Penjaringan, Jakarta Utara, DKI Jakarta
+            </p>
+          </div>
+
+          <form onsubmit="event.preventDefault(); masukAdmin();" class="space-y-3.5 text-xs">
+            <div class="flex items-center border border-slate-300 rounded-md overflow-hidden bg-white">
+              <span class="px-3 py-2.5 text-slate-400 border-r border-slate-200 font-bold">✉</span>
+              <input type="text" value="admin@ratelhome.id" readonly
+                class="w-full px-3 py-2.5 text-xs font-semibold text-slate-600 bg-slate-50 focus:outline-none">
+            </div>
+
+            <div class="flex items-center border border-slate-300 rounded-md overflow-hidden bg-white focus-within:border-blue-600">
+              <span class="px-3 py-2.5 text-slate-400 border-r border-slate-200 font-bold">🔑</span>
+              <input type="password" id="pinAdminInput" inputmode="numeric" required placeholder="Input PIN Admin (default: 123456)"
+                class="w-full px-3 py-2.5 text-xs font-bold text-slate-800 placeholder-slate-400 focus:outline-none">
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+              <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" checked class="rounded border-slate-300 text-blue-600">
+                <span>Remember me</span>
+              </label>
+              <span class="text-blue-700 font-semibold">Masuk 09.00–09.30 • Pulang 17.00–17.30</span>
+            </div>
+
+            <div class="pt-1 text-center">
+              <button type="submit"
+                class="inline-flex items-center justify-center gap-2 bg-[#1245d6] hover:bg-[#0e36a8] text-white font-bold text-xs px-7 py-2.5 rounded-md shadow transition">
+                <span>↪</span> <span>LOG IN</span>
+              </button>
+            </div>
+            <p id="errAdminLogin" class="text-[11px] font-bold text-rose-600 text-center hidden">PIN Admin salah.</p>
+          </form>
+        </div>
+
+        <div class="border-t border-slate-100 pt-3 flex items-center justify-between text-[11px] text-slate-400">
+          <span>Portal Khusus Admin</span>
+          <span id="loginClock" class="font-bold text-slate-600">Server: --:--:--</span>
+        </div>
+      </div>
+
+      <div class="md:col-span-6 welcome-panel rounded-2xl shadow-xl text-white p-8 flex flex-col items-center justify-center text-center space-y-4">
+        <div class="space-y-2 max-w-xs">
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-wide uppercase">WELCOME!</h2>
+          <p class="text-xs sm:text-sm text-blue-100 leading-relaxed">
+            Panel Admin PT RATEL HOME — Kelola data NRP karyawan, monitoring wajah & GPS, serta pengumuman dan dokumen.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD ADMIN -->
+  <div id="adminDashboard" class="hidden min-h-screen flex flex-col lg:flex-row">
+    <aside class="w-full lg:w-56 sidebar-panel text-slate-200 flex flex-col justify-between shrink-0">
+      <div>
+        <div class="px-4 py-3 bg-[#23272b] flex items-center gap-2.5 border-b border-slate-700/60">
+          <span class="w-7 h-7 rounded bg-white text-slate-900 font-extrabold text-xs flex items-center justify-center">R</span>
+          <span class="font-bold text-sm text-white">Admin Panel</span>
+        </div>
+
+        <div class="px-4 py-3 flex items-center gap-2.5 border-b border-slate-700/50">
+          <div class="w-8 h-8 rounded-full bg-sky-600 text-white font-extrabold text-xs flex items-center justify-center shrink-0">RH</div>
+          <div class="min-w-0">
+            <p class="text-xs font-bold text-white truncate">PT Ratel Home</p>
+            <p class="text-[10px] text-emerald-400">● Admin Aktif</p>
+          </div>
+        </div>
+
+        <nav class="p-2 space-y-0.5 text-xs">
+          <button onclick="bukaMenu('dashboard')" id="m-dashboard" class="m-btn w-full text-left px-3 py-2 rounded bg-[#3f474e] text-white font-semibold">⊞ Dashboard</button>
+          <button onclick="bukaMenu('karyawan')" id="m-karyawan" class="m-btn w-full text-left px-3 py-2 rounded text-slate-300 hover:bg-[#383f45]">👥 Data Karyawan (+ / Hapus)</button>
+          <button onclick="bukaMenu('wajah')" id="m-wajah" class="m-btn w-full text-left px-3 py-2 rounded text-slate-300 hover:bg-[#383f45]">🤳 Registrasi Wajah</button>
+          <button onclick="bukaMenu('jam')" id="m-jam" class="m-btn w-full text-left px-3 py-2 rounded text-slate-300 hover:bg-[#383f45]">⏰ Pengaturan Jam Kerja</button>
+          <button onclick="bukaMenu('lokasi')" id="m-lokasi" class="m-btn w-full text-left px-3 py-2 rounded text-slate-300 hover:bg-[#383f45]">📍 Pengaturan Lokasi Kantor</button>
+          <button onclick="bukaMenu('monitoring')" id="m-monitoring" class="m-btn w-full text-left px-3 py-2 rounded text-slate-300 hover:bg-[#383f45]">📡 Monitoring & Pengumuman</button>
+          <button onclick="bukaMenu('riwayat')" id="m-riwayat" class="m-btn w-full text-left px-3 py-2 rounded text-slate-300 hover:bg-[#383f45]">🕒 Riwayat Absensi</button>
+          <button onclick="bukaMenu('laporan')" id="m-laporan" class="m-btn w-full text-left px-3 py-2 rounded text-slate-300 hover:bg-[#383f45]">📄 Laporan</button>
+          <button onclick="bukaMenu('pengaturan')" id="m-pengaturan" class="m-btn w-full text-left px-3 py-2 rounded text-slate-300 hover:bg-[#383f45]">⚙ Pengaturan Sistem</button>
+        </nav>
+      </div>
+
+      <div class="p-3 border-t border-slate-700/60 space-y-2 text-[11px]">
+        <div class="text-slate-400">Server: <span class="srv-clock font-bold text-slate-200">--:--:--</span></div>
+        <button onclick="keluarAdmin()" class="w-full bg-rose-600/20 hover:bg-rose-600 text-rose-200 hover:text-white font-bold py-1.5 rounded">Logout</button>
+      </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0">
+      <header class="bg-white border-b border-slate-200 px-4 py-2 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-20">
+        <div class="flex items-center gap-3 text-xs">
+          <button onclick="bukaMenu('dashboard')" class="text-slate-600 font-bold">☰</button>
+          <button onclick="bukaMenu('dashboard')" class="text-slate-600 font-medium">Home</button>
+          <button onclick="bukaMenu('lokasi')" class="text-slate-600 font-medium">Contact</button>
+          <div class="flex items-center border border-slate-300 rounded overflow-hidden">
+            <input type="text" id="cariAdmin" oninput="renderAdmin()" placeholder="Search" class="px-2.5 py-1 text-xs w-36 sm:w-48 focus:outline-none">
+            <span class="px-2 py-1 bg-slate-50 text-slate-500 text-xs">🔍</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+          <button onclick="muatData(true)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded">↻ Refresh</button>
+          <span class="font-semibold text-slate-700">Admin</span>
+        </div>
+      </header>
+
+      <div class="px-4 sm:px-6 pt-4 pb-2 flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="judulMenuAdmin" class="text-xl font-bold text-slate-800">Dashboard</h2>
+        <div class="text-xs text-slate-500"><span class="text-blue-600 font-semibold">Home</span> / <span id="crumbAdmin">Dashboard</span></div>
+      </div>
+
+      <main class="px-4 sm:px-6 pb-8 space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
+          <div class="bg-[#17a2b8] text-white rounded shadow-sm overflow-hidden">
+            <div class="p-3.5 flex items-center justify-between">
+              <div><p id="cKar" class="text-2xl font-extrabold">0</p><p class="text-xs text-cyan-50">Karyawan Terdaftar</p></div>
+              <span class="text-4xl opacity-35">👥</span>
+            </div>
+            <button onclick="bukaMenu('karyawan')" class="w-full bg-black/15 hover:bg-black/25 text-[11px] py-1 px-3">More info ⊕</button>
+          </div>
+          <div class="bg-[#28a745] text-white rounded shadow-sm overflow-hidden">
+            <div class="p-3.5 flex items-center justify-between">
+              <div><p id="cRegis" class="text-2xl font-extrabold">0</p><p class="text-xs text-emerald-50">Akun NRP Aktif</p></div>
+              <span class="text-4xl opacity-35">🪪</span>
+            </div>
+            <button onclick="bukaMenu('wajah')" class="w-full bg-black/15 hover:bg-black/25 text-[11px] py-1 px-3">More info ⊕</button>
+          </div>
+          <div class="bg-[#ffc107] text-slate-900 rounded shadow-sm overflow-hidden">
+            <div class="p-3.5 flex items-center justify-between">
+              <div><p id="cAbsen" class="text-2xl font-extrabold">0</p><p class="text-xs font-semibold">Total Absensi</p></div>
+              <span class="text-4xl opacity-30">🕒</span>
+            </div>
+            <button onclick="bukaMenu('monitoring')" class="w-full bg-black/10 hover:bg-black/20 text-[11px] font-semibold py-1 px-3">More info ⊕</button>
+          </div>
+          <div class="bg-[#dc3545] text-white rounded shadow-sm overflow-hidden">
+            <div class="p-3.5 flex items-center justify-between">
+              <div><p id="cDoc" class="text-2xl font-extrabold">0</p><p class="text-xs text-rose-50">Pengumuman & Dokumen</p></div>
+              <span class="text-4xl opacity-35">📢</span>
+            </div>
+            <button onclick="bukaMenu('monitoring')" class="w-full bg-black/15 hover:bg-black/25 text-[11px] py-1 px-3">More info ⊕</button>
+          </div>
+        </div>
+
+        <section id="sec-dashboard" class="sec-adm bg-white rounded border border-slate-200 shadow-sm p-4 space-y-3 text-xs">
+          <p class="font-bold text-slate-800">PT RATEL HOME • Y5.T, No. 8, Pluit, Penjaringan, Jakarta Utara, DKI Jakarta</p>
+          <p class="text-slate-500">Jadwal Masuk: <strong id="tMasuk">09.00–09.30</strong> • Jadwal Pulang: <strong id="tPulang">17.00–17.30</strong> • Verifikasi: Foto Wajah + GPS Lokasi + Waktu Server</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-y border-slate-200 text-slate-700">
+                  <th class="py-2 px-3">#</th>
+                  <th class="py-2 px-3">NRP & Nama</th>
+                  <th class="py-2 px-3">Jenis</th>
+                  <th class="py-2 px-3">Jam & Tanggal</th>
+                  <th class="py-2 px-3">GPS</th>
+                  <th class="py-2 px-3">Status</th>
+                </tr>
+              </thead>
+              <tbody id="tblDashAbsen" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="sec-karyawan" class="sec-adm hidden grid grid-cols-1 lg:grid-cols-12 gap-4 text-xs">
+          <div class="lg:col-span-4 bg-white rounded border border-slate-200 shadow-sm p-4 space-y-3 h-fit">
+            <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Tambah Karyawan</h3>
+            <input type="text" id="inNrp" placeholder="No. NRP (cth: NRP-002)" class="w-full border border-slate-300 rounded px-3 py-1.5 font-bold uppercase">
+            <input type="text" id="inNama" placeholder="Nama Lengkap Karyawan" class="w-full border border-slate-300 rounded px-3 py-1.5 font-semibold">
+            <input type="text" id="inJabatan" placeholder="Jabatan / Divisi" class="w-full border border-slate-300 rounded px-3 py-1.5 font-semibold">
+            <button onclick="tambahKar()" class="w-full bg-[#17a2b8] hover:bg-[#138496] text-white font-bold py-2 rounded">+ Tambah Karyawan</button>
+          </div>
+
+          <div class="lg:col-span-8 bg-white rounded border border-slate-200 shadow-sm p-4">
+            <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2 mb-3">Daftar Karyawan (Dapat Login dengan Nama & NRP)</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-y border-slate-200 text-slate-700">
+                    <th class="py-2 px-3">NRP</th>
+                    <th class="py-2 px-3">Nama Lengkap</th>
+                    <th class="py-2 px-3">Jabatan</th>
+                    <th class="py-2 px-3">Akun</th>
+                    <th class="py-2 px-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tblKar" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-wajah" class="sec-adm hidden bg-white rounded border border-slate-200 shadow-sm p-4 text-xs space-y-3">
+          <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Foto Wajah Karyawan dari Absensi</h3>
+          <div id="boxWajah" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"></div>
+        </section>
+
+        <section id="sec-jam" class="sec-adm hidden bg-white rounded border border-slate-200 shadow-sm p-4 max-w-md space-y-3 text-xs">
+          <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Pengaturan Jam Kerja</h3>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div><label class="block font-semibold mb-1">Masuk Mulai</label><input type="time" id="jmMulai" value="09:00" class="w-full border border-slate-300 rounded px-2.5 py-1.5 font-bold"></div>
+            <div><label class="block font-semibold mb-1">Masuk Selesai</label><input type="time" id="jmSelesai" value="09:30" class="w-full border border-slate-300 rounded px-2.5 py-1.5 font-bold"></div>
+            <div><label class="block font-semibold mb-1">Pulang Mulai</label><input type="time" id="jpMulai" value="17:00" class="w-full border border-slate-300 rounded px-2.5 py-1.5 font-bold"></div>
+            <div><label class="block font-semibold mb-1">Pulang Selesai</label><input type="time" id="jpSelesai" value="17:30" class="w-full border border-slate-300 rounded px-2.5 py-1.5 font-bold"></div>
+          </div>
+          <button onclick="simpanCfg()" class="bg-[#28a745] text-white font-bold px-4 py-2 rounded">Simpan Jam Kerja</button>
+        </section>
+
+        <section id="sec-lokasi" class="sec-adm hidden bg-white rounded border border-slate-200 shadow-sm p-4 max-w-xl space-y-3 text-xs">
+          <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Lokasi Kantor PT RATEL HOME</h3>
+          <input type="text" id="lokNama" value="PT RATEL HOME — Kantor Utama" class="w-full border border-slate-300 rounded px-3 py-1.5 font-semibold">
+          <input type="text" id="lokAlamat" value="Y5.T, No. 8, Pluit, Penjaringan, Jakarta Utara, DKI Jakarta" class="w-full border border-slate-300 rounded px-3 py-1.5 font-semibold">
+          <div class="grid grid-cols-3 gap-2">
+            <input type="text" id="lokLat" value="-6.1264" class="border border-slate-300 rounded px-3 py-1.5">
+            <input type="text" id="lokLng" value="106.7918" class="border border-slate-300 rounded px-3 py-1.5">
+            <input type="number" id="lokRad" value="300" class="border border-slate-300 rounded px-3 py-1.5">
+          </div>
+          <button onclick="simpanCfg()" class="bg-[#17a2b8] text-white font-bold px-4 py-2 rounded">Simpan Lokasi</button>
+        </section>
+
+        <section id="sec-monitoring" class="sec-adm hidden grid grid-cols-1 lg:grid-cols-12 gap-4 text-xs">
+          <div class="lg:col-span-5 bg-white rounded border border-slate-200 shadow-sm p-4 space-y-3 h-fit">
+            <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Tambah Pengumuman & Dokumen</h3>
+            <input type="text" id="docJudul" placeholder="Judul Pengumuman *" class="w-full border border-slate-300 rounded px-3 py-1.5 font-semibold">
+            <textarea id="docIsi" rows="3" placeholder="Isi Pengumuman untuk Karyawan *" class="w-full border border-slate-300 rounded px-3 py-1.5 font-semibold"></textarea>
+            <input type="text" id="docNamaFile" placeholder="Nama Dokumen (cth: Rekap-Bulanan.txt)" class="w-full border border-slate-300 rounded px-3 py-1.5 font-semibold">
+            <input type="text" id="docLinkAtauIsi" placeholder="URL Dokumen (https://...) atau isi teks dokumen" class="w-full border border-slate-300 rounded px-3 py-1.5 font-semibold">
+            <button onclick="tambahDoc()" class="w-full bg-[#28a745] hover:bg-[#218838] text-white font-bold py-2 rounded">+ Publikasikan ke Karyawan</button>
+          </div>
+
+          <div class="lg:col-span-7 bg-white rounded border border-slate-200 shadow-sm p-4 space-y-2">
+            <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Monitoring Absensi (NRP, Nama, Waktu Server & GPS)</h3>
+            <div id="boxMonitoring" class="space-y-2"></div>
+          </div>
+        </section>
+
+        <section id="sec-riwayat" class="sec-adm hidden bg-white rounded border border-slate-200 shadow-sm p-4 text-xs space-y-2">
+          <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Riwayat Absensi</h3>
+          <div id="boxRiwayat" class="space-y-2"></div>
+        </section>
+
+        <section id="sec-laporan" class="sec-adm hidden bg-white rounded border border-slate-200 shadow-sm p-4 text-xs space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-800">Laporan Absensi</h3>
+            <button onclick="unduhCsv()" class="bg-[#28a745] text-white font-bold px-3 py-1.5 rounded">⬇ Download CSV</button>
+          </div>
+          <p id="lapInfo" class="text-slate-600">-</p>
+        </section>
+
+        <section id="sec-pengaturan" class="sec-adm hidden bg-white rounded border border-slate-200 shadow-sm p-4 max-w-lg text-xs space-y-2">
+          <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Pengaturan Sistem</h3>
+          <input type="text" id="apiBox" readonly class="w-full border border-slate-300 bg-slate-50 rounded px-3 py-1.5 font-mono text-[11px]">
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycby5Nc58HvvapvxlYmwSCSXmAI3IM614PXZk9z2FjmFNcDWboWUfdW1ND9zqtK8eGL3F/exec";
+    const PIN_ADMIN = "123456";
+    const KEY_DB = "rh_adm_db_v3";
+
+    let db = {
+      cfg: { masukMulai: "09:00", masukSelesai: "09:30", pulangMulai: "17:00", pulangSelesai: "17:30", nama: "PT RATEL HOME — Kantor Utama", alamat: "Y5.T, No. 8, Pluit, Penjaringan, Jakarta Utara, DKI Jakarta", lat: -6.1264, lng: 106.7918, rad: 300 },
+      karyawan: [{ nrp: "NRP-001", nama: "Ovaroldus Supratman", jabatan: "Operasional", akun: "Menunggu Login" }],
+      absensi: [],
+      dokumen: []
+    };
+
+    function muatLokal() {
+      try { const r = localStorage.getItem(KEY_DB); if (r) db = { ...db, ...JSON.parse(r) }; } catch (e) {}
+    }
+    function simpanLokal() { localStorage.setItem(KEY_DB, JSON.stringify(db)); }
+
+    function updateJam() {
+      const t = new Date().toLocaleTimeString("id-ID");
+      document.querySelectorAll(".srv-clock").forEach(e => e.textContent = t);
+      const lc = document.getElementById("loginClock");
+      if (lc) lc.textContent = "Server: " + t;
+    }
+
+    async function muatData(manual = false) {
+      try {
+        const res = await fetch(`${API_URL}?t=${Date.now()}`);
+        const d = await res.json();
+        if (Array.isArray(d.karyawan) && d.karyawan.length > 0) {
+          db.karyawan = d.karyawan.map(k => ({ nrp: k.NRP, nama: k.Nama_Lengkap, jabatan: k.Jabatan || "-", akun: k.Status_Akun || "Terdaftar" }));
+        }
+        if (Array.isArray(d.absensiKaryawan)) {
+          db.absensi = d.absensiKaryawan.map(a => ({
+            nrp: a.NRP, nama: a.Nama_Lengkap, jenis: a.Jenis, jam: a.Jam_Absen, tanggal: a.Tanggal,
+            waktuServer: a.Waktu_Server, status: a.Status_Waktu, jarak: a.Jarak_Meter, gps: a.GPS_Koordinat, foto: a.Foto_Data
+          }));
+        }
+        if (Array.isArray(d.pengumumanDokumen)) {
+          db.dokumen = d.pengumumanDokumen.map(x => ({
+            id: x.ID_Item, waktu: x.Waktu_Dibuat, judul: x.Judul, isi: x.Isi_Pengumuman, namaFile: x.Nama_Dokumen, linkAtauIsi: x.Isi_Atau_URL
+          })).reverse();
+        }
+        simpanLokal();
+        if (manual) alert("Data Admin berhasil disinkronkan dari Google Sheets.");
+      } catch (e) {
+        if (manual) alert("Gagal memuat data dari Google Sheets: " + e);
+      }
+      renderAdmin();
+    }
+
+    async function kirimPost(payload) {
+      try {
+        await fetch(API_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {}
+    }
+
+    function masukAdmin() {
+      const pin = document.getElementById("pinAdminInput").value.trim();
+      if (pin !== PIN_ADMIN) {
+        document.getElementById("errAdminLogin").classList.remove("hidden");
+        return;
+      }
+      document.getElementById("errAdminLogin").classList.add("hidden");
+      document.getElementById("adminLoginScreen").classList.add("hidden");
+      document.getElementById("adminDashboard").classList.remove("hidden");
+      renderAdmin();
+    }
+
+    function keluarAdmin() {
+      document.getElementById("adminDashboard").classList.add("hidden");
+      document.getElementById("adminLoginScreen").classList.remove("hidden");
+    }
+
+    function bukaMenu(m) {
+      document.querySelectorAll(".sec-adm").forEach(s => s.classList.add("hidden"));
+      document.getElementById("sec-" + m).classList.remove("hidden");
+      document.querySelectorAll(".m-btn").forEach(b => b.className = "m-btn w-full text-left px-3 py-2 rounded text-slate-300 hover:bg-[#383f45]");
+      const act = document.getElementById("m-" + m);
+      if (act) act.className = "m-btn w-full text-left px-3 py-2 rounded bg-[#3f474e] text-white font-semibold";
+      const lbl = { dashboard: "Dashboard", karyawan: "Data Karyawan", wajah: "Registrasi Wajah", jam: "Pengaturan Jam Kerja", lokasi: "Pengaturan Lokasi Kantor", monitoring: "Monitoring Absensi", riwayat: "Riwayat Absensi", laporan: "Laporan", pengaturan: "Pengaturan Sistem" }[m] || "Dashboard";
+      document.getElementById("judulMenuAdmin").textContent = lbl;
+      document.getElementById("crumbAdmin").textContent = lbl;
+    }
+
+    function tambahKar() {
+      const nrp = document.getElementById("inNrp").value.trim().toUpperCase();
+      const nama = document.getElementById("inNama").value.trim();
+      const jabatan = document.getElementById("inJabatan").value.trim() || "Karyawan";
+      if (!nrp || !nama) return alert("NRP dan Nama wajib diisi.");
+      db.karyawan.push({ nrp, nama, jabatan, akun: "Menunggu Login" });
+      simpanLokal();
+      kirimPost({ action: "tambah_karyawan", pin: PIN_ADMIN, nrp, nama, jabatan });
+      document.getElementById("inNrp").value = "";
+      document.getElementById("inNama").value = "";
+      document.getElementById("inJabatan").value = "";
+      renderAdmin();
+    }
+
+    function hapusKar(nrp) {
+      if (!confirm(`Hapus karyawan ${nrp}?`)) return;
+      db.karyawan = db.karyawan.filter(k => k.nrp !== nrp);
+      simpanLokal();
+      kirimPost({ action: "hapus_karyawan", pin: PIN_ADMIN, nrp });
+      renderAdmin();
+    }
+
+    function simpanCfg() {
+      db.cfg.masukMulai = document.getElementById("jmMulai").value;
+      db.cfg.masukSelesai = document.getElementById("jmSelesai").value;
+      db.cfg.pulangMulai = document.getElementById("jpMulai").value;
+      db.cfg.pulangSelesai = document.getElementById("jpSelesai").value;
+      db.cfg.nama = document.getElementById("lokNama").value;
+      db.cfg.alamat = document.getElementById("lokAlamat").value;
+      db.cfg.lat = Number(document.getElementById("lokLat").value) || db.cfg.lat;
+      db.cfg.lng = Number(document.getElementById("lokLng").value) || db.cfg.lng;
+      db.cfg.rad = Number(document.getElementById("lokRad").value) || db.cfg.rad;
+      simpanLokal();
+      alert("Pengaturan tersimpan.");
+      renderAdmin();
+    }
+
+    function tambahDoc() {
+      const judul = document.getElementById("docJudul").value.trim();
+      const isi = document.getElementById("docIsi").value.trim();
+      const namaFile = document.getElementById("docNamaFile").value.trim();
+      const linkAtauIsi = document.getElementById("docLinkAtauIsi").value.trim();
+      if (!judul || !isi) return alert("Judul dan isi pengumuman wajib diisi.");
+      db.dokumen.unshift({ id: "DOC-" + Date.now(), waktu: new Date().toLocaleString("id-ID"), judul, isi, namaFile, linkAtauIsi });
+      simpanLokal();
+      kirimPost({ action: "tambah_pengumuman_dokumen", pin: PIN_ADMIN, judul, isi, namaDokumen: namaFile, urlDokumen: linkAtauIsi });
+      document.getElementById("docJudul").value = "";
+      document.getElementById("docIsi").value = "";
+      document.getElementById("docNamaFile").value = "";
+      document.getElementById("docLinkAtauIsi").value = "";
+      alert("Pengumuman & dokumen dipublikasikan ke portal karyawan.");
+      renderAdmin();
+    }
+
+    function unduhCsv() {
+      const rows = [["Waktu Server", "Tanggal", "NRP", "Nama", "Jenis", "Jam", "Status", "Jarak", "GPS"]];
+      db.absensi.forEach(a => rows.push([a.waktuServer, a.tanggal, a.nrp, a.nama, a.jenis, a.jam, a.status, a.jarak, a.gps]));
+      const blob = new Blob([rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = "absensi-ratel-home.csv"; a.click(); URL.revokeObjectURL(url);
+    }
+
+    function renderAdmin() {
+      document.getElementById("apiBox").value = API_URL;
+      document.getElementById("tMasuk").textContent = `${db.cfg.masukMulai}–${db.cfg.masukSelesai}`;
+      document.getElementById("tPulang").textContent = `${db.cfg.pulangMulai}–${db.cfg.pulangSelesai}`;
+      document.getElementById("cKar").textContent = db.karyawan.length;
+      document.getElementById("cRegis").textContent = db.karyawan.filter(k => String(k.akun).toLowerCase().includes("terdaftar")).length;
+      document.getElementById("cAbsen").textContent = db.absensi.length;
+      document.getElementById("cDoc").textContent = db.dokumen.length;
+
+      const q = (document.getElementById("cariAdmin")?.value || "").trim().toLowerCase();
+      const absList = q ? db.absensi.filter(a => `${a.nrp} ${a.nama} ${a.jenis} ${a.status}`.toLowerCase().includes(q)) : db.absensi;
+
+      document.getElementById("tblDashAbsen").innerHTML = absList.length === 0
+        ? `<tr><td colspan="6" class="py-4 text-center text-slate-400">Belum ada absensi masuk.</td></tr>`
+        : absList.slice(0, 15).map((a, i) => `
+          <tr>
+            <td class="py-2 px-3">${i + 1}</td>
+            <td class="py-2 px-3 font-bold">${a.nama} <span class="text-slate-400 font-normal">(${a.nrp})</span></td>
+            <td class="py-2 px-3">${a.jenis}</td>
+            <td class="py-2 px-3">${a.tanggal || ""} • ${a.jam || ""}</td>
+            <td class="py-2 px-3">${a.gps || "-"} (${a.jarak ?? "-"}m)</td>
+            <td class="py-2 px-3"><span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">${a.status || "Tercatat"}</span></td>
+          </tr>`).join("");
+
+      document.getElementById("tblKar").innerHTML = db.karyawan.map(k => `
+        <tr>
+          <td class="py-2 px-3 font-extrabold">${k.nrp}</td>
+          <td class="py-2 px-3 font-bold">${k.nama}</td>
+          <td class="py-2 px-3">${k.jabatan}</td>
+          <td class="py-2 px-3"><span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-bold">${k.akun}</span></td>
+          <td class="py-2 px-3 text-right"><button onclick="hapusKar('${k.nrp}')" class="bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white font-bold px-2.5 py-1 rounded">Hapus</button></td>
+        </tr>`).join("");
+
+      const fotos = db.absensi.filter(a => a.foto);
+      document.getElementById("boxWajah").innerHTML = fotos.length === 0
+        ? `<p class="text-slate-400 col-span-full">Belum ada foto wajah absen.</p>`
+        : fotos.slice(0, 12).map(a => `
+          <div class="border border-slate-200 rounded p-2.5 flex items-center gap-2.5">
+            <img src="${a.foto}" class="w-12 h-12 rounded object-cover border">
+            <div><p class="font-bold">${a.nama}</p><p class="text-[10px] text-slate-500">${a.nrp} • ${a.jenis}</p></div>
+          </div>`).join("");
+
+      const monHtml = absList.length === 0
+        ? `<p class="text-slate-400">Belum ada data absensi.</p>`
+        : absList.slice(0, 20).map(a => `
+          <div class="border border-slate-200 rounded p-2.5 flex items-center justify-between">
+            <div><p class="font-bold">${a.nama} (${a.nrp}) — ${a.jenis}</p><p class="text-[11px] text-slate-500">${a.waktuServer || ""} • GPS: ${a.gps}</p></div>
+            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">${a.status}</span>
+          </div>`).join("");
+      document.getElementById("boxMonitoring").innerHTML = monHtml;
+      document.getElementById("boxRiwayat").innerHTML = monHtml;
+      document.getElementById("lapInfo").textContent = `Karyawan: ${db.karyawan.length}, Absensi: ${db.absensi.length}, Pengumuman/Dokumen: ${db.dokumen.length}.`;
+    }
+
+    muatLokal();
+    updateJam();
+    setInterval(updateJam, 1000);
+    muatData(false);
+  </script>
+</body>
+</html>
